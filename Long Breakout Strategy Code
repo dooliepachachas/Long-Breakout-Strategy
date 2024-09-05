@@ -1,0 +1,27 @@
+
+[IntrabarOrderGeneration = false]
+
+inputs: 
+	Strength( 4 ) [DisplayName = "Strength", ToolTip = 
+	 "Enter the number of bars to the left and right of the pivot bar to confirm the High pivot."];
+	
+variables: 
+	Setup( false ), 
+	Pivothigh( 0 );
+
+//Strategy signal logic
+if SwingHigh( 1, High, Strength, Strength + 1 ) <> -1 then //confirmed Swing Hi 
+begin
+	Setup = true;
+	Pivothigh = High[Strength];
+end
+else if Setup and High >= Pivothigh + 1 point then
+	Setup = false;
+	
+	{ 
+	the High >= PivotHigh being true indicates that a buy must already have been 
+	triggered at this bar so this setup has been used up and needs to be negated; 
+	}
+
+if Setup then 
+	Buy ( !( "PivRevLE" ) ) next bar at Pivothigh + 1 point stop;
